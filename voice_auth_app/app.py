@@ -1,8 +1,10 @@
 import os
 import time
 from datetime import datetime
-from flask import Flask, request, render_template, jsonify, make_response
+import psutil  # 💡 추가
+from flask import Flask, request, render_template, jsonify, make_response, redirect, url_for
 from speechbrain.inference.speaker import SpeakerRecognition
+
 
 app = Flask(__name__)
 UPLOAD_FOLDER = '/app/voice_data'
@@ -76,9 +78,36 @@ def verify_password():
 
 @app.route('/dashboard')
 def dashboard():
-    # 💡 원래는 쿠키를 검사해서 인증된 사람만 열어주어야 안전합니다.
-    # 지금은 시험 가동 단계이므로 웹 페이지가 잘 뜨는지 바로 라우팅되도록 처리합니다.
+    # 1. 브라우저에서 'nas_voice_auth' 쿠키 값을 긁어옵니다.
+    auth_cookie = request.cookies.get('nas_voice_auth')
+    
+    # 2. 쿠키가 아예 없거나, 값이 우리가 설정한 'authenticated_true'가 아니라면 위조범입니다.
+    if not auth_cookie or auth_cookie != 'authenticated_true':
+        print("[보안 경고] 인증되지 않은 사용자가 대시보드 직공격을 시도하여 대문으로 추방합니다.")
+        # 🚪 가차 없이 첫 대문 로그인 화면('/')으로 튕겨버립니다.
+        return redirect(url_for('index'))
+    
+    # 3. 쿠키가 완벽하게 일치하는 검증된 주인님만 대시보드 화면을 열어줍니다.
     return render_template('dashboard.html')
+
+@app.route('/system-status', methods=['GET'])
+def system_status():
+    auth_cookie = request.cookies.get('nas_voice_auth')
+    if not auth_cookie or auth_cookie != 'authenticated_true':
+        return jsonify({"success": False, "message": "권한이 없습니다. 해킹 시도가 감지되었습니다."}), 403
+
+    try:
+        cpu_usage = psutil.cpu_percentage(interval=None)
+        ram = psutil.virtual_memory()
+        return jsonify({
+            "success": True,
+            "cpu": cpu_usage,
+            "ram": ram.percent,
+            "ram_used_gb": round(ram.used / (1024**3), 2),
+            "ram_total_gb": round(ram.total / (1024**3), 2)
+        })
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
