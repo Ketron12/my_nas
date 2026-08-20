@@ -1,3 +1,11 @@
-.env
-.db
-.wav
+*.env
+*.db
+*.wav
+*.ckpt
+hyperparams.yaml
+/letsencrypt
+/ollama_storage
+/plex_config
+/proxy_data
+/webui_storage
+/portainer_data

@@ -32,14 +32,18 @@ services:
     restart: always
     networks:
       - nas_core_net
-    # 💡 Nginx 프록시가 내부 네트워크망을 통해 연결해 줄 것이므로 외부 포트 노출(ports:)은 제외합니다.
+    ports:
+      - "8082:80"
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Seoul
     volumes:
-      - ./nas_data:/srv
-      - ./filebrowser.db:/database.db
+      #- ./nas_data:/srv
+      # 💡 [여기만 수정] 오른쪽 컨테이너 내부 경로를 /filebrowser.db 로 완벽히 맞추어 줍니다!
+      #- ./filebrowser.db:/filebrowser.db
+      - C:/my_nas/nas_data:/srv
+      - C:/my_nas/filebrowser.db:/filebrowser.db
 
   # 📊 도커 관리 대시보드 (Portainer)
   infra-portainer:

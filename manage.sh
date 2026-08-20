@@ -47,7 +47,7 @@ read -p "원하는 작업 번호를 입력하세요: " CHOICE
 case $CHOICE in
     1)
         echo "🌐 공용 가상 네트워크를 개설합니다..."
-        docker compose -f $CORE up -d
+        docker network create nas_core_net
         echo "🚀 모든 서비스 그룹 전체를 순차 가동합니다..."
         docker compose $ALL_FILES up -d
         echo "✅ 모든 서비스가 백그라운드에서 정상 가동되었습니다."
@@ -55,6 +55,7 @@ case $CHOICE in
     2)
         echo "🛑 안전하게 모든 컨테이너 서비스를 종료합니다..."
         docker compose $ALL_FILES down
+        docker network rm nas_core_net
         echo "✅ 모든 서비스가 안전하게 중지되었습니다."
         ;;
     3)
