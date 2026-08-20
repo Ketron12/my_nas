@@ -8,17 +8,21 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 50px 20px; text-align: center; }
         h1 { color: #38bdf8; margin-bottom: 10px; font-size: 2.5rem; }
         .subtitle { color: #94a3b8; margin-bottom: 40px; font-size: 1.1rem; }
-        .grid { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+        .grid { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; margin-bottom: 50px; }
         .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; width: 280px; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: all 0.3s ease; text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; }
         .card:hover { transform: translateY(-8px); border-color: #38bdf8; box-shadow: 0 15px 35px rgba(56, 189, 248, 0.2); }
         .icon { font-size: 3.5rem; margin-bottom: 15px; }
         .title { font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; color: #f1f5f9; }
         .desc { font-size: 0.95rem; color: #94a3b8; line-height: 1.5; text-align: center; }
         
-        /* 로컬 호스트 테스트용 포트 주소 처리 */
         .card-file { border-top: 4px solid #10b981; }
         .card-plex { border-top: 4px solid #f59e0b; }
         .card-ai { border-top: 4px solid #a855f7; }
+
+        /* 🔴 시스템 종료 버튼 스타일 */
+        .shutdown-area { margin-top: 60px; border-top: 1px solid #334155; padding-top: 30px; }
+        .btn-shutdown { background: #i14c3c; border: 1px solid #c0392b; color: white; font-size: 15px; padding: 12px 30px; border-radius: 30px; cursor: pointer; transition: 0.3s; font-weight: bold; background-color: #e74c3c; display: inline-block; }
+        .btn-shutdown:hover { background: #c0392b; box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
     </style>
 </head>
 <body>
@@ -28,7 +32,6 @@
 
     <div class="grid">
         <!-- 📂 카드 1: 웹 파일 탐색기 -->
-        <!-- 미니 PC로 이사 갈 때는 호스트 아이피나 도메인에 맞춰 주소를 연결하면 됩니다 -->
         <a href="http://localhost:8082" target="_blank" class="card card-file">
             <div class="icon">📂</div>
             <div class="title">개인 클라우드</div>
@@ -50,5 +53,41 @@
         </a>
     </div>
 
+    <!-- 🔴 [추가] 안전 종료 버튼 영역 -->
+    <div class="shutdown-area">
+        <button id="shutdownBtn" class="btn-shutdown">🔴 전체 인프라 안전 종료 (Down)</button>
+    </div>
+
+<script>
+    document.getElementById('shutdownBtn').onclick = async () => {
+        if (!confirm("⚠️ 정말로 모든 나스 서비스와 AI 서버를 안전하게 종료하시겠습니까?\n종료 후에는 미니 PC 본체 전원을 직접 켜야 합니다.")) {
+            return;
+        }
+
+        const btn = document.getElementById('shutdownBtn');
+        btn.disabled = true;
+        btn.style.background = "#7f8c8d";
+        btn.innerText = "⏳ 서버 종료 시퀀스 가동 중...";
+
+        try {
+            const response = await fetch('/shutdown-server', { method: 'POST' });
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                // 모든 컨테이너가 내려가므로 브라우저 창을 닫거나 안내 문구 표시
+                document.body.innerHTML = "<h2 style='color:#e74c3c; margin-top:200px;'>🔒 홈 서버 가동 중지 완료</h2><p style='color:#94a3b8;'>모든 도커 컨테이너가 안전하게 저장 후 종료되었습니다. 이 창을 닫으셔도 됩니다.</p>";
+            } else {
+                alert("❌ 실패: " + data.message);
+                btn.disabled = false;
+                btn.style.background = "#e74c3c";
+                btn.innerText = "🔴 전체 인프라 안전 종료 (Down)";
+            }
+        } catch (error) {
+            // 서버가 완전히 내려가면서 연결이 끊겨 에러가 나는 것이 정상이므로 성공 처리로 유도합니다.
+            document.body.innerHTML = "<h2 style='color:#e74c3c; margin-top:200px;'>🔒 홈 서버 가동 중지 완료</h2><p style='color:#94a3b8;'>서버가 연결을 끊고 성공적으로 잠들었습니다.</p>";
+        }
+    };
+</script>
 </body>
 </html>

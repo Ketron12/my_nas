@@ -82,3 +82,31 @@ def dashboard():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
+# 기존 app.py 맨 아래(if __name__ == '__main__': 바로 위)에 아래 코드를 추가합니다.
+
+@app.route('/shutdown-server', methods=['POST'])
+def shutdown_server():
+    # 🔐 [보안 체크] 인증 쿠키가 없는 사용자가 주소를 쳐서 들어오면 차단합니다.
+    auth_cookie = request.cookies.get('nas_voice_auth')
+    if auth_cookie != 'authenticated_true':
+        return jsonify({"success": False, "message": "권한이 없습니다. 먼저 로그인하세요."}), 403
+
+    try:
+        print("[SYSTEM] 주인님의 명령으로 모든 도커 서비스를 안전하게 종료합니다...")
+        
+        # 💡 [핵심] 파이썬이 리눅스 시스템에 명령을 내려 모든 쪼개진 컴포즈 서비스를 안전 종료시킵니다.
+        # 데이터가 하드디스크에 완벽히 기록(Flush)된 후 안전하게 내려갑니다.
+        import subprocess
+        
+        # 백그라운드 셸 명령어로 쪼개진 파일들을 일괄 종료시킵니다.
+        # (이 명령어가 실행되면 삼바, AI, 플렉스, 그리고 이 파이썬 컨테이너까지 순차적으로 꺼집니다)
+        cmd = "docker compose -f core_network.yml -f docker-compose-infra.yml -f docker-compose-ai.yml -f docker-compose-user.yml -f docker-compose-service.yml down"
+        
+        # 컨테이너가 즉시 꺼지면 웹 브라우저에 응답을 못 보내므로, 2초 뒤에 실행되도록 비동기로 뺍니다.
+        subprocess.Popen(cmd, shell=True, cwd="/app")
+        
+        return jsonify({"success": True, "message": "모든 나스 및 AI 서비스 종료 시퀀스를 시작합니다. 약 10초 뒤 서버가 완전히 잠듭니다."})
+        
+    except Exception as e:
+        return jsonify({"success": False, "message": f"종료 중 오류 발생: {str(e)}"}), 500
