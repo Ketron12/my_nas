@@ -74,5 +74,11 @@ def verify_password():
         return response
     return jsonify({"success": False, "message": "비밀번호 오류"}), 401
 
+@app.route('/dashboard')
+def dashboard():
+    # 💡 원래는 쿠키를 검사해서 인증된 사람만 열어주어야 안전합니다.
+    # 지금은 시험 가동 단계이므로 웹 페이지가 잘 뜨는지 바로 라우팅되도록 처리합니다.
+    return render_template('dashboard.html')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

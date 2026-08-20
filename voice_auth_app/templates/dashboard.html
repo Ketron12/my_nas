@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛸 내 미니 PC 홈 인프라 포털</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 50px 20px; text-align: center; }
+        h1 { color: #38bdf8; margin-bottom: 10px; font-size: 2.5rem; }
+        .subtitle { color: #94a3b8; margin-bottom: 40px; font-size: 1.1rem; }
+        .grid { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; width: 280px; padding: 30px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); transition: all 0.3s ease; text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; }
+        .card:hover { transform: translateY(-8px); border-color: #38bdf8; box-shadow: 0 15px 35px rgba(56, 189, 248, 0.2); }
+        .icon { font-size: 3.5rem; margin-bottom: 15px; }
+        .title { font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; color: #f1f5f9; }
+        .desc { font-size: 0.95rem; color: #94a3b8; line-height: 1.5; text-align: center; }
+        
+        /* 로컬 호스트 테스트용 포트 주소 처리 */
+        .card-file { border-top: 4px solid #10b981; }
+        .card-plex { border-top: 4px solid #f59e0b; }
+        .card-ai { border-top: 4px solid #a855f7; }
+    </style>
+</head>
+<body>
+
+    <h1>🛸 내 미니 PC 개인 홈 서버</h1>
+    <div class="subtitle">보안 게이트웨이가 인증한 안전한 개인 가상 공간입니다.</div>
+
+    <div class="grid">
+        <!-- 📂 카드 1: 웹 파일 탐색기 -->
+        <!-- 미니 PC로 이사 갈 때는 호스트 아이피나 도메인에 맞춰 주소를 연결하면 됩니다 -->
+        <a href="http://localhost:8082" target="_blank" class="card card-file">
+            <div class="icon">📂</div>
+            <div class="title">개인 클라우드</div>
+            <div class="desc">Filebrowser 기반의 초경량 웹 파일 탐색기입니다. 자유롭게 파일을 업/다운로드하세요.</div>
+        </a>
+
+        <!-- 🎬 카드 2: 플렉스 미디어 서버 -->
+        <a href="http://localhost:32400/web" target="_blank" class="card card-plex">
+            <div class="icon">🎬</div>
+            <div class="title">플렉스 미디어</div>
+            <div class="desc">나스에 저장된 영화, 드라마, 미디어를 집안 어디서든 고화질로 스트리밍 시청합니다.</div>
+        </a>
+
+        <!-- 🤖 카드 3: Open WebUI 로컬 AI -->
+        <a href="http://localhost:3000" target="_blank" class="card card-ai">
+            <div class="icon">🤖</div>
+            <div class="title">로컬 AI 챗봇</div>
+            <div class="desc">Gemma 4, Llama 3.1 등 외부 유출 없는 강력한 내 개인 전용 AI와 대화를 나눕니다.</div>
+        </a>
+    </div>
+
+</body>
+</html>

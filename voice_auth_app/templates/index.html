@@ -54,7 +54,7 @@
             const data = await response.json(); resultDiv.style.display = 'block';
             if (data.success && data.is_match) {
                 resultDiv.className = "match"; resultDiv.innerHTML = "✅ 주인 인증 성공!";
-                setTimeout(() => { window.location.href = "http://localhost:8082"; }, 1500); // 💡성공 시 파일 브라우저로 리다이렉트
+                setTimeout(() => { window.location.href = "/dashboard"; }, 1500); // 💡성공 시 파일 브라우저로 리다이렉트
             } else {
                 resultDiv.className = "fail"; resultDiv.innerHTML = "❌ 목소리 불일치. 2차 백업 필요.";
                 passwordArea.style.display = 'block';
@@ -68,7 +68,7 @@
             const response = await fetch('/verify-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: passwordInput }) });
             if (response.ok) {
                 resultDiv.className = "match"; resultDiv.innerHTML = "✅ 백업 인증 성공!";
-                setTimeout(() => { window.location.href = "http://localhost:8082"; }, 1500);
+                setTimeout(() => { window.location.href = "/dashboard"; }, 1500);
             } else { alert("비밀번호가 틀렸습니다."); }
         } catch { alert("서버 통신 실패"); }
     };
