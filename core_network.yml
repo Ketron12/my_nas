@@ -1,0 +1,6 @@
+version: '3.8'
+
+networks:
+  nas_core_net:
+    name: nas_core_net
+    driver: bridge

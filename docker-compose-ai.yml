@@ -1,0 +1,38 @@
+version: '3.8'
+
+networks:
+  nas_core_net:
+    external: true
+
+services:
+  ai-ollama:
+    image: ollama/ollama:latest
+    container_name: ai_ollama
+    restart: always
+    networks:
+      - nas_core_net
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama_storage:/root/.ollama
+    environment:
+      - TZ=Asia/Seoul
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_NOPRUNE=1
+
+  ai-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ai_webui
+    restart: always
+    networks:
+      - nas_core_net
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./webui_storage:/app/backend/data
+    environment:
+      - TZ=Asia/Seoul
+      # 💡 가상 네트워크를 공유하므로 컨테이너 서비스 이름(ai-ollama)으로 다이렉트 통신합니다.
+      - OLLAMA_BASE_URL=http://ai-ollama:11434
+    depends_on:
+      - ai-ollama

@@ -1,0 +1,35 @@
+version: '3.8'
+
+networks:
+  nas_core_net:
+    external: true  # 💡 이미 생성된 외부 네트워크를 가져와 씁니다.
+
+services:
+  infra-samba:
+    image: dperson/samba:latest
+    container_name: nas_samba
+    restart: always
+    networks:
+      - nas_core_net
+    ports:
+      - "445:445"   # 💡 미니PC(우분투)에서는 충돌이 없으므로 원래 포트 사용
+      - "139:139"
+    volumes:
+      - ./nas_data:/mnt/nas_data
+    environment:
+      - TZ=Asia/Seoul
+    command: ["-u", "nasadmin;password123", "-s", "NasShare;/mnt/nas_data;yes;no;no;nasadmin"]
+
+  infra-portainer:
+    image: portainer/portainer-ce:latest
+    container_name: nas_portainer
+    restart: always
+    networks:
+      - nas_core_net
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer_data:/data
+    environment:
+      - PORTAINER_NO_SETUP_TOKEN=1 # 💡 토큰 요구 패스 설정
