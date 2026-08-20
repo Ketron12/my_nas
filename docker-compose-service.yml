@@ -17,4 +17,7 @@ services:
       - ./voice_auth_app:/app
       - ./voice_data:/app/voice_data
     working_dir: /app
+    environment:
+      # 💡 .env 파일에 기록된 비밀번호를 시스템 환경변수로 안전하게 주입합니다.
+      - MASTER_PASSWORD=${MASTER_PASSWORD}
     command: sh -c "pip install -r requirements.txt && python app.py"

@@ -8,8 +8,9 @@ app = Flask(__name__)
 UPLOAD_FOLDER = '/app/voice_data'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# 🔐실패 시 로그인을 허용할 2차 마스터 패스워드
-MASTER_PASSWORD = "my_secure_password_123"
+# 🔐 [보안 강화] 소스 코드에서 비밀번호를 지우고, 도커 환경변수에서 동적으로 가져옵니다.
+# 만약 환경변수가 비어있다면 에러 방지를 위해 기본 임시 비밀번호를 할당합니다.
+MASTER_PASSWORD = os.environ.get("MASTER_PASSWORD", "default_fallback_pass_123")
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
