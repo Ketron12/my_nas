@@ -12,12 +12,9 @@ services:
     networks:
       - nas_core_net
     ports:
-      - "5000:5000" # 내 노트북/미니PC 5000번 포트로 웹 접속
+      - "5000:5000"
     volumes:
-      # 소스 코드가 있는 폴더를 연결하여 컨테이너 내부에서 실행합니다.
       - ./voice_auth_app:/app
-      # 음성 데이터가 저장될 공유 볼륨
       - ./voice_data:/app/voice_data
     working_dir: /app
-    # 컨테이너가 켜질 때 필요한 라이브러리를 깔고 파이썬 앱을 실행합니다.
     command: sh -c "pip install -r requirements.txt && python app.py"

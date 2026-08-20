@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 로컬 게이트웨이</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f4f6f9; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-block; width: 350px; }
+        button { font-size: 16px; padding: 12px; margin: 10px 0; border: none; border-radius: 6px; cursor: pointer; width: 100%; }
+        .btn-record { background: #e74c3c; color: white; }
+        .btn-stop { background: #34495e; color: white; display: none; }
+        .btn-verify { background: #2ecc71; color: white; display: none; }
+        #status { font-weight: bold; margin: 20px 0; color: #7f8c8d; }
+        #result { margin-top: 25px; padding: 15px; border-radius: 6px; display: none; font-weight: bold; }
+        .match { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        #passwordArea { display: none; margin-top: 25px; padding-top: 20px; border-top: 2px dashed #ccc; }
+        input { width: 90%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; text-align: center; margin-bottom: 10px; }
+        .btn-pass { background: #3498db; color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>🎙️ AI 로컬 게이트웨이</h2>
+    <div id="status">준비 완료</div>
+    <button id="recordBtn" class="btn-record">🎙️ 목소리 녹음 시작</button>
+    <button id="stopBtn" class="btn-stop">⏹️ 녹음 중지</button>
+    <button id="verifyBtn" class="btn-verify">🔐 인증 요청</button>
+    <div id="result"></div>
+    <div id="passwordArea">
+        <input type="password" id="backupPassword" placeholder="2차 비밀번호 입력">
+        <button id="passBtn" class="btn-pass">확인 및 로그인</button>
+    </div>
+</div>
+<script>
+    let mediaRecorder, audioChunks = [], audioBlob;
+    const recordBtn = document.getElementById('recordBtn'), stopBtn = document.getElementById('stopBtn'), verifyBtn = document.getElementById('verifyBtn'), statusDiv = document.getElementById('status'), resultDiv = document.getElementById('result'), passwordArea = document.getElementById('passwordArea'), passBtn = document.getElementById('passBtn');
+
+    recordBtn.onclick = async () => {
+        audioChunks = [];
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => { audioBlob = new Blob(audioChunks, { type: 'audio/wav' }); verifyBtn.style.drop_down = 'block'; verifyBtn.style.display = 'block'; statusDiv.innerText = "녹음 완료"; };
+        mediaRecorder.start(); recordBtn.style.display = 'none'; stopBtn.style.display = 'block'; statusDiv.innerText = "🗣️ 말씀해 주세요..."; resultDiv.style.display = 'none'; passwordArea.style.display = 'none';
+    };
+    stopBtn.onclick = () => { mediaRecorder.stop(); stopBtn.style.display = 'none'; recordBtn.style.display = 'block'; };
+
+    verifyBtn.onclick = async () => {
+        statusDiv.innerText = "🤖 AI 목소리 매칭 중..."; verifyBtn.style.display = 'none';
+        const formData = new FormData(); formData.append('audio', audioBlob, 'auth_attempt.wav');
+        try {
+            const response = await fetch('/verify', { method: 'POST', body: formData });
+            const data = await response.json(); resultDiv.style.display = 'block';
+            if (data.success && data.is_match) {
+                resultDiv.className = "match"; resultDiv.innerHTML = "✅ 주인 인증 성공!";
+                setTimeout(() => { window.location.href = "http://localhost:8082"; }, 1500); // 💡성공 시 파일 브라우저로 리다이렉트
+            } else {
+                resultDiv.className = "fail"; resultDiv.innerHTML = "❌ 목소리 불일치. 2차 백업 필요.";
+                passwordArea.style.display = 'block';
+            }
+        } catch { alert("서버 통신 실패"); }
+    };
+
+    passBtn.onclick = async () => {
+        const passwordInput = document.getElementById('backupPassword').value;
+        try {
+            const response = await fetch('/verify-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: passwordInput }) });
+            if (response.ok) {
+                resultDiv.className = "match"; resultDiv.innerHTML = "✅ 백업 인증 성공!";
+                setTimeout(() => { window.location.href = "http://localhost:8082"; }, 1500);
+            } else { alert("비밀번호가 틀렸습니다."); }
+        } catch { alert("서버 통신 실패"); }
+    };
+</script>
+</body>
+</html>

@@ -12,14 +12,12 @@ services:
     networks:
       - nas_core_net
     ports:
-      - "32400:32400" # 플렉스 웹 관리자 및 스트리밍 기본 포트
+      - "32400:32400"
     environment:
-      - PUID=1000 # 우분투 기본 사용자의 UID (권한 충돌 방지)
-      - PGID=1000 # 윈도우 탐색기(Samba)로 넣은 영상을 플렉스가 바로 읽을 수 있게 해줍니다.
+      - PUID=1000
+      - PGID=1000
       - TZ=Asia/Seoul
       - VERSION=docker
     volumes:
-      - ./plex_config:/config # 플렉스 포스터, 자막 데이터 저장 공간
-      # 💡 [핵심 연동] 삼바 컨테이너와 동일한 'nas_data' 폴더를 매핑합니다.
-      # 삼바 나스에 영화를 넣으면 플렉스가 실시간으로 감지하여 영화 정보를 긁어옵니다.
-      - ./nas_data:/data 
+      - ./plex_config:/config
+      - ./nas_data:/data
