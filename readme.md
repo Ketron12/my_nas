@@ -14,7 +14,10 @@ Or if you are running in Windows(wsl),
 4. Run "docker compose -f core_network.yml up -d"
 5. Run "docker compose -f docker-compose-infra.yml -f docker-compose-ai.yml -f docker-compose-user.yml -f docker-compose-service.yml up -d"
 
-This porject is for making little home server which includes,
+Also Record your voice and Name it "master.wav".
+Save it inside of voice_data folder.
+
+This project is for making little home server which includes,
 filebrowser,
 ollama with openwebui,
 voice check for safety,
