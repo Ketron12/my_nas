@@ -47,3 +47,19 @@ services:
       - ./portainer_data:/data
     environment:
       - PORTAINER_NO_SETUP_TOKEN=1
+
+    # 📂 docker-compose-infra.yml 내부 DuckDNS 서비스 부분
+  infra-duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: nas_duckdns
+    restart: always
+    networks:
+      - nas_core_net
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Seoul
+      # 💡 내 서브도메인 이름 기입 (뒤에 .duckdns.org는 제외)
+      - SUBDOMAINS=ketron-nas
+      # 💡 [보안 강화] 소스 코드에서 토큰을 지우고, .env에서 동적으로 주입받습니다.
+      - TOKEN=${DUCKDNS_TOKEN}
