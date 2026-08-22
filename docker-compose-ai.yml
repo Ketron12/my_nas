@@ -1,10 +1,9 @@
-version: '3.8'
-
 networks:
   nas_core_net:
     external: true
 
 services:
+  # 로컬 AI 구동 엔진 (Ollama)
   ai-ollama:
     image: ollama/ollama:latest
     container_name: ai_ollama
@@ -20,6 +19,7 @@ services:
       - OLLAMA_NUM_PARALLEL=1
       - OLLAMA_NOPRUNE=1
 
+  # ChatGPT 스타일 웹 인터페이스 (Open WebUI)
   ai-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: ai_webui

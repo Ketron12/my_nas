@@ -1,10 +1,9 @@
-version: '3.8'
-
 networks:
   nas_core_net:
     external: true
 
 services:
+  # 미디어 스트리밍 서버 (Plex)
   user-plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: nas_plex
@@ -21,3 +20,59 @@ services:
     volumes:
       - ./plex_config:/config
       - ./nas_data:/data
+
+  # 개인용 구글 포토 메인 서버 (Immich Server)
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    container_name: immich_server
+    restart: always
+    networks:
+      - nas_core_net
+    ports:
+      - "2283:2283"
+    volumes:
+      - ./immich_data/upload:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - DB_HOSTNAME=immich-db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=immich_secure_pass_123
+      - DB_DATABASE_NAME=immich
+      - REDIS_HOSTNAME=immich-redis
+      - TZ=Asia/Seoul
+    depends_on:
+      - immich-db
+      - immich-redis
+
+  # Immich 사진 인식 머신러닝 모듈
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    container_name: immich_ml
+    restart: always
+    networks:
+      - nas_core_net
+    volumes:
+      - ./immich_data/cache:/cache
+    environment:
+      - TZ=Asia/Seoul
+      - NUMBER_OF_THREADS=2
+
+  immich-redis:
+    image: docker.io/redis:6.2-alpine
+    container_name: immich_redis
+    restart: always
+    networks:
+      - nas_core_net
+
+  immich-db:
+    image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0
+    container_name: immich_db
+    restart: always
+    networks:
+      - nas_core_net
+    environment:
+      - POSTGRES_PASSWORD=immich_secure_pass_123
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=immich
+    volumes:
+      - ./immich_data/postgres:/var/lib/postgresql/data

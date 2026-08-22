@@ -1,5 +1,0 @@
-flask
-speechbrain
-torchaudio
-numpy
-psutil  # 💡 [추가] 실시간 시스템 리소스 확인용 라이브러리

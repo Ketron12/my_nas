@@ -1,11 +1,9 @@
-version: '3.8'
-
 networks:
   nas_core_net:
     external: true
 
 services:
-  # 🌐 [추가] 외부 접속 및 HTTPS 암호화를 총괄하는 Nginx Proxy Manager
+  # 외부 접속 및 HTTPS 암호화를 총괄하는 Nginx Proxy Manager
   infra-proxy:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: nas_proxy
@@ -13,39 +11,29 @@ services:
     networks:
       - nas_core_net
     ports:
-      # 💡 윈도우 시스템 포트(80, 443)와 충돌을 피하기 위해 왼쪽(외부 포트)만 바꿉니다.
-      - '8080:80'   # HTTP 접속은 이제 8080 포트로
-      - '8443:443'  # HTTPS 접속은 이제 8443 포트로
-      - '81:81'     # 프록시 관리 화면은 그대로 81
-      # 리눅스라면 아래 포트 설정을 사용하셔도 됩니다.
-      #- '80:80'   # 일반 HTTP 웹 접속 통로
-      #- '443:443' # 🔒 마이크 권한 획득에 필수적인 HTTPS 보안 접속 통로
-      #- '81:81'   # Nginx 프록시 자체 관리자 웹 화면 포트
+      - '80:80'
+      - '443:443'
+      - '81:81'
     volumes:
       - ./proxy_data:/data
       - ./letsencrypt:/etc/letsencrypt
 
-  # 📂 초경량 웹 파일 탐색기 (Filebrowser)
+  # 초경량 웹 파일 탐색기 (Filebrowser)
   infra-filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: nas_filebrowser
     restart: always
     networks:
       - nas_core_net
-    ports:
-      - "8082:80"
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Seoul
     volumes:
       - ./nas_data:/srv
-      # 💡 [여기만 수정] 오른쪽 컨테이너 내부 경로를 /filebrowser.db 로 완벽히 맞추어 줍니다!
       - ./filebrowser.db:/filebrowser.db
-      #- C:/my_nas/my_nas/nas_data:/srv
-      #- C:/my_nas/my_nas/filebrowser.db:/filebrowser.db
 
-  # 📊 도커 관리 대시보드 (Portainer)
+  # 도커 관리 대시보드 (Portainer)
   infra-portainer:
     image: portainer/portainer-ce:latest
     container_name: nas_portainer

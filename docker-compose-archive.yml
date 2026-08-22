@@ -1,0 +1,45 @@
+networks:
+  nas_core_net:
+    external: true
+
+services:
+  # 넷플릭스 스타일 압축 미디어 뷰어 (Lanraragi)
+  user-lanraragi:
+    image: difegue/lanraragi:latest
+    container_name: nas_viewer
+    restart: always
+    networks:
+      - nas_core_net
+    ports:
+      - "3005:3000"
+    volumes:
+      - ./lanraragi_config:/home/lanraragi/lanraragi/data
+      - ./nas_data/Archive:/home/lanraragi/lanraragi/content:ro
+    depends_on:
+      - user-downloader
+
+  # 100% 무료 익명 IP 세탁 터널 (Tor + Privoxy 통합본)
+  user-archive-tor:
+    image: dockage/tor-privoxy:latest
+    container_name: nas_archive_tor
+    restart: always
+    networks:
+      - nas_core_net
+
+  # 자동 다운로드 엔진 (HathDownloader / Gallery-DL Web)
+  user-downloader:
+    image: custom-hath-downloader:latest
+    container_name: nas_downloader
+    restart: always
+    network_mode: "container:nas_archive_tor"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Seoul
+      - E_COOKIES=ipb_member_id=xxxx; ipb_pass_hash=xxxx; star=xxxx
+      - HTTP_PROXY=http://127.0.0.1:8118
+      - HTTPS_PROXY=http://127.0.0.1:8118
+    volumes:
+      - ./nas_data/Archive:/downloads
+    depends_on:
+      - user-archive-tor

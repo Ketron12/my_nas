@@ -1,23 +1,20 @@
-version: '3.8'
-
 networks:
   nas_core_net:
     external: true
 
 services:
-  voice-auth-service:
+  face-auth-service:
     image: pytorch/pytorch:latest
-    container_name: voice_auth_ai
+    container_name: face_auth_ai
     restart: always
     networks:
       - nas_core_net
     ports:
       - "5000:5000"
-    # 💡 [필수 추가] 파이썬 컨테이너가 미니 PC 본체 전원을 원격으로 끌 수 있도록 마스터 권한을 선언합니다.
-    privileged: true
+    privileged: true # 미니 PC 본체 전원 차단을 위한 커널 마스터 권한
     volumes:
-      - ./voice_auth_app:/app
-      - ./voice_data:/app/voice_data
+      - ./face_auth_app:/app
+      - ./face_data:/app/face_data
     working_dir: /app
     environment:
       - MASTER_PASSWORD=${MASTER_PASSWORD}
