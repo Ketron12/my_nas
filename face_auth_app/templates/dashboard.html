@@ -2,9 +2,12 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>🛸 내 미니 PC 홈 인프라 포털</title>
+    <title>🛸 Home Infrastructure Portal</title>
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 50px 20px; text-align: center; }
+        body { font-family: sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 50px 20px; text-align: center; position: relative; }
+        .lang-switcher { position: absolute; top: 20px; right: 20px; }
+        .lang-btn { background: #1e293b; color: white; border: 1px solid #334155; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .lang-btn:hover { background: #38bdf8; }
         .header-area { display: flex; justify-content: center; align-items: center; gap: 15px; max-width: 600px; margin: 0 auto 10px auto; }
         h1 { color: #38bdf8; margin: 0; font-size: 2.5rem; }
         .btn-monitor { background: #334155; border: 1px solid #475569; font-size: 1.5rem; padding: 10px; border-radius: 50%; cursor: pointer; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; color: white; }
@@ -36,61 +39,38 @@
     </style>
 </head>
 <body>
-    <div class="header-area">
-        <h1>🛸 내 미니 PC 홈 인프라 포털</h1>
-        <button id="monitorBtn" class="btn-monitor">📊</button>
-    </div>
-    <div class="subtitle"><span id="secretTrigger">🛸</span> 보안 게이트웨이가 인증한 안전한 가상 공간입니다.</div>
 
-    <div class="grid">
-        <a href="/file" target="_blank" class="card card-file"><div class="icon">📂</div><div class="title">개인 클라우드</div><div class="desc">웹 파일 탐색기입니다. 자유롭게 파일을 관리하세요.</div></a>
-        <a href="http://localhost:32400/web" target="_blank" class="card card-plex"><div class="icon">🎬</div><div class="title">플렉스 미디어</div><div class="desc">영화 및 미디어를 집안 어디서든 스트리밍합니다.</div></a>
-        <a href="http://localhost:3000" target="_blank" class="card card-ai"><div class="icon">🤖</div><div class="title">로컬 AI 챗봇</div><div class="desc">외부 유출 없는 강력한 내 개인 전용 AI와 대화합니다.</div></a>
-        <a href="http://localhost:2283" target="_blank" class="card card-immich"><div class="icon">📸</div><div class="title">사진 클라우드</div><div class="desc">모바일 백그라운드 사진 자동 백업 구글 포토입니다.</div></a>
-    </div>
+<div class="lang-switcher"><button id="toggleLang" class="lang-btn">EN</button></div>
 
-    <div id="monitorModal" class="modal">
-        <div class="modal-content">
-            <span id="closeModal" class="close-btn">&times;</span>
-            <div class="stat-group">
-                <div class="stat-label"><span>CPU 사용량</span> <span id="cpuText">0%</span></div>
-                <div class="bar-bg"><div id="cpuBar" class="bar-fill cpu-fill"></div></div>
-            </div>
-            <div class="stat-group">
-                <div class="stat-label"><span>RAM 사용량</span> <span id="ramText">0%</span></div>
-                <div class="bar-bg"><div id="ramBar" class="bar-fill ram-fill"></div></div>
-                <div id="ramDetails" class="details-text">0 GB 사용 중</div>
-            </div>
+<div class="header-area">
+    <h1 id="dashTitle">🛸 내 미니 PC 개인 홈 서버</h1>
+    <button id="monitorBtn" class="btn-monitor">📊</button>
+</div>
+<div class="subtitle"><span id="secretTrigger">🛸</span> <span id="dashSubtitle">보안 게이트웨이가 인증한 안전한 가상 공간입니다.</span></div>
+
+<div class="grid">
+    <a href="/file" target="_blank" class="card card-file"><div class="icon">📂</div><div id="c1Title" class="title">개인 클라우드</div><div id="c1Desc" class="desc">웹 파일 탐색기입니다. 자유롭게 파일을 관리하세요.</div></a>
+    <a href="http://localhost:32400/web" target="_blank" class="card card-plex"><div class="icon">🎬</div><div id="c2Title" class="title">플렉스 미디어</div><div id="c2Desc" class="desc">영화 및 미디어를 집안 어디서든 스트리밍합니다.</div></a>
+    <a href="http://localhost:3000" target="_blank" class="card card-ai"><div class="icon">🤖</div><div id="c3Title" class="title">로컬 AI 챗봇</div><div id="c3Desc" class="desc">외부 유출 없는 강력한 내 개인 전용 AI와 대화합니다.</div></a>
+    <a href="http://localhost:2283" target="_blank" class="card card-immich"><div class="icon">📸</div><div id="c4Title" class="title">사진 클라우드</div><div id="c4Desc" class="desc">모바일 백그라운드 사진 자동 백업 구글 포토입니다.</div></a>
+</div>
+
+<div id="monitorModal" class="modal">
+    <div class="modal-content">
+        <span id="closeModal" class="close-btn">&times;</span>
+        <div class="stat-group">
+            <div class="stat-label"><span id="mCpu">CPU 사용량</span> <span id="cpuText">0%</span></div>
+            <div class="bar-bg"><div id="cpuBar" class="bar-fill cpu-fill"></div></div>
+        </div>
+        <div class="stat-group">
+            <div class="stat-label"><span id="mRam">RAM 사용량</span> <span id="ramText">0%</span></div>
+            <div class="bar-bg"><div id="ramBar" class="bar-fill ram-fill"></div></div>
+            <div id="ramDetails" class="details-text">0 GB 사용 중</div>
         </div>
     </div>
-    <div class="shutdown-area"><button id="shutdownBtn" class="btn-shutdown">🔴 미니 PC 본체 전원 차단</button></div>
+</div>
+<div class="shutdown-area"><button id="shutdownBtn" class="btn-shutdown">🔴 미니 PC 본체 전원 차단</button></div>
 
-<script>
-    // 🛸 이스터에그 비밀 게이트웨이 기믹 (3번 연속 클릭 시 만화창 오픈)
-    let clickCount = 0;
-    document.getElementById('secretTrigger').onclick = () => {
-        clickCount++;
-        if (clickCount === 3) { clickCount = 0; window.open("http://localhost:3005", "_blank"); }
-        setTimeout(() => { clickCount = 0; }, 3000);
-    };
-
-    const modal = document.getElementById('monitorModal'), monitorBtn = document.getElementById('monitorBtn'), closeModal = document.getElementById('closeModal');
-    let updateInterval;
-    async function updateStats() {
-        const res = await fetch('/system-status'), data = await res.json();
-        if (data.success) {
-            document.getElementById('cpuText').innerText = data.cpu + "%"; document.getElementById('cpuBar').style.width = data.cpu + "%";
-            document.getElementById('ramText').innerText = data.ram + "%"; document.getElementById('ramBar').style.width = data.ram + "%";
-            document.getElementById('ramDetails').innerText = `${data.ram_used_gb} GB / ${data.ram_total_gb} GB 사용 중`;
-        }
-    }
-    monitorBtn.onclick = () => { modal.style.display = 'flex'; updateStats(); updateInterval = setInterval(updateStats, 1000); };
-    closeModal.onclick = () => { modal.style.display = 'none'; clearInterval(updateInterval); };
-
-    document.getElementById('shutdownBtn').onclick = async () => {
-        if (!confirm("⚠️ 미니 PC 본체 하드웨어 전원을 완전히 차단하시겠습니까?")) return;
-        try { await fetch('/shutdown-server', { method: 'POST' }); document.body.innerHTML = "<h2>🔒 시스템 안전 종료 완료</h2>"; } catch { document.body.innerHTML = "<h2>🔒 시스템 안전 종료 완료</h2>"; }
-    };
-</script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 </body>
 </html>
